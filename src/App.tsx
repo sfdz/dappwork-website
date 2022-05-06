@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import OpenBounties from './OpenBounties';
+import OpenBounties from './components/OpenBounties';
 
 function App() {
   return (
