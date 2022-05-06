@@ -10,6 +10,7 @@ import {
 type Bounty = {
     project: string,
     issue: string,
+    issueLink: string,
     bountyAmount: string,
     postedDate: string
 };
@@ -20,12 +21,14 @@ const defaultData: Bounty[] = [
     {
         project: 'DAppWork',
         issue: 'Add github link to bounty titles',
+        issueLink: 'https://github.com/',
         bountyAmount: '.005 WETH',
         postedDate: '2022-05-05'
     },
     {
         project: 'Polygon',
         issue: 'Reach a billion users',
+        issueLink: 'https://github.com/',
         bountyAmount: '.006 WETH',
         postedDate: '2022-05-06'
     },
@@ -42,7 +45,7 @@ const defaultColumns = [
             }),
             table.createDataColumn(row => row.issue, {
                 id: 'issue',
-                cell: info => info.value,
+                cell: ({ row }) => <a href={row.original?.issueLink}>{row.original?.issue}</a>,
                 header: () => <span>Issue</span>,
             }),
             table.createDataColumn(row => row.bountyAmount, {
