@@ -2,6 +2,8 @@ import React from 'react';
 import {
     createTable,
     getCoreRowModelSync,
+    getSortedRowModelSync,
+    SortingState,
     useTableInstance,
   } from '@tanstack/react-table'
 
@@ -20,7 +22,13 @@ const defaultData: Bounty[] = [
         issue: 'Add github link to bounty titles',
         bountyAmount: '.005 WETH',
         postedDate: '2022-05-05'
-    }
+    },
+    {
+        project: 'Polygon',
+        issue: 'Reach a billion users',
+        bountyAmount: '.006 WETH',
+        postedDate: '2022-05-06'
+    },
 ]
 
 const defaultColumns = [
@@ -53,16 +61,22 @@ const defaultColumns = [
 
 function OpenBounties() {
     // eslint-disable-next-line
-    const [data, _setData] = React.useState(() => [...defaultData])
+    const [data] = React.useState(() => [...defaultData]);
     const [columns] = React.useState<typeof defaultColumns>(() => [
         ...defaultColumns,
-    ])
+    ]);
+    const [sorting, setSorting] = React.useState<SortingState>([]);
 
     const instance = useTableInstance(table, {
         data,
         columns,
+        state: {
+            sorting,
+        },
+        onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModelSync(),
-    })
+        getSortedRowModel: getSortedRowModelSync(),
+    });
 
       return (
         <div>
@@ -72,7 +86,22 @@ function OpenBounties() {
                     <tr key={headerGroup.id}>
                     {headerGroup.headers.map(header => (
                         <th key={header.id} colSpan={header.colSpan}>
-                        {header.isPlaceholder ? null : header.renderHeader()}
+                        {header.isPlaceholder ? null : (
+                            <div
+                                {...{
+                                    className: header.column.getCanSort()
+                                        ? 'cursor-pointer select-none'
+                                        : '',
+                                    onClick: header.column.getToggleSortingHandler(),
+                                }}
+                            >
+                                {header.renderHeader()}
+                                {{
+                                    asc: ' 🔼',
+                                    desc: ' 🔽',
+                                }[header.column.getIsSorted() as string] ?? null}
+                            </div>
+                        )}
                         </th>
                     ))}
                     </tr>
@@ -88,7 +117,7 @@ function OpenBounties() {
                 ))}
                 </tbody>
             </table>
-      </div>
+        </div>
       )
 }
 
