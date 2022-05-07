@@ -124,4 +124,4 @@ function OpenBounties() {
       )
 }
 
-export default OpenBounties; 
+export default OpenBounties;
