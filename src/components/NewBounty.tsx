@@ -11,18 +11,18 @@ const renderBackButton = (formStep: FormStep, setFormStep: any) => {
     if (formStep === FormStep.IssueURL || formStep === FormStep.BountyCreated) {
         return undefined;
     }
-    var nextStep: FormStep;
+    var prevStep: FormStep;
     switch (formStep) {
         case FormStep.BountyAmount:
-            nextStep = FormStep.IssueURL;
+            prevStep = FormStep.IssueURL;
             break;
         case FormStep.BountyPreview:
-            nextStep = FormStep.BountyAmount;
+            prevStep = FormStep.BountyAmount;
             break;
     }
     return (
         <button
-            onClick={() => {setFormStep(nextStep)}}
+            onClick={() => {setFormStep(prevStep)}}
             type='button'
         >
             back
