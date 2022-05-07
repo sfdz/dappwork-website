@@ -1,4 +1,5 @@
 import React from 'react';
+import { useForm } from 'react-hook-form';
 
 enum FormStep {
     IssueURL,
@@ -7,7 +8,7 @@ enum FormStep {
     BountyCreated,
 }
 
-const renderBackButton = (formStep: FormStep, setFormStep: any) => {
+const renderBackButton = (formStep: FormStep, setFormStep: any, isValid: boolean) => {
     if (formStep === FormStep.IssueURL || formStep === FormStep.BountyCreated) {
         return undefined;
     }
@@ -22,6 +23,7 @@ const renderBackButton = (formStep: FormStep, setFormStep: any) => {
     }
     return (
         <button
+            disabled={!isValid}
             onClick={() => {setFormStep(prevStep)}}
             type='button'
         >
@@ -29,7 +31,7 @@ const renderBackButton = (formStep: FormStep, setFormStep: any) => {
         </button>);
 }
 
-const renderNextButton = (formStep: FormStep, setFormStep: any) => {
+const renderNextButton = (formStep: FormStep, setFormStep: any, isValid: boolean) => {
     if (formStep === FormStep.BountyCreated) {
         return undefined;
     }
@@ -47,6 +49,7 @@ const renderNextButton = (formStep: FormStep, setFormStep: any) => {
     }
     return (
         <button
+            disabled={!isValid}
             onClick={() => {setFormStep(nextStep)}}
             type='button'
         >
@@ -56,11 +59,24 @@ const renderNextButton = (formStep: FormStep, setFormStep: any) => {
 
 const NewBounty = () => {
     const [formStep, setFormStep] = React.useState(FormStep.IssueURL);
+    const { watch, register, formState } = useForm({
+        mode: 'all'
+    });
 
     return (
         <form>
             {formStep === FormStep.IssueURL && <section>
                 <p>issue url pls</p>
+                <input
+                    type="text"
+                    id="issue_url"
+                    className="text-input"
+                    autoComplete="off"
+                    {...register("test", {
+                        required: true,
+                        pattern: /^https:\/\/github.com\/[^-][^/]{0,38}\/[-_.A-Za-z0-9]{1,100}\/issues\/\d{1,10}\/?$/
+                      })}
+                />
             </section>}
             {formStep === FormStep.BountyAmount && <section>
                 <p>bounty amount pls</p>
@@ -71,8 +87,8 @@ const NewBounty = () => {
             {formStep === FormStep.BountyCreated && <section>
                 <p>your bounty was created</p>
             </section>}
-            {renderBackButton(formStep, setFormStep)}
-            {renderNextButton(formStep, setFormStep)}
+            {renderBackButton(formStep, setFormStep, formState.isValid)}
+            {renderNextButton(formStep, setFormStep, formState.isValid)}
         </form>
     );
 }
