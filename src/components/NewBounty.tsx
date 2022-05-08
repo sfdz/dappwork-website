@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FieldValues, FormState, useForm, UseFormGetValues } from 'react-hook-form';
 
 enum FormStep {
     IssueURL,
@@ -8,7 +8,7 @@ enum FormStep {
     BountyCreated,
 }
 
-const renderBackButton = (formStep: FormStep, setFormStep: any, isValid: boolean) => {
+const renderBackButton = (formStep: FormStep, setFormStep: any) => {
     if (formStep === FormStep.IssueURL || formStep === FormStep.BountyCreated) {
         return undefined;
     }
@@ -23,7 +23,6 @@ const renderBackButton = (formStep: FormStep, setFormStep: any, isValid: boolean
     }
     return (
         <button
-            disabled={!isValid}
             onClick={() => {setFormStep(prevStep)}}
             type='button'
         >
@@ -57,9 +56,52 @@ const renderNextButton = (formStep: FormStep, setFormStep: any, isValid: boolean
         </button>);
 }
 
+const issueURLPattern = /^https:\/\/github.com\/([^-][^/]{0,38})\/([-_.A-Za-z0-9]{1,100})\/issues\/\d{1,10}\/?$/;
+
+const validateIssueURL = (url: string) => {
+    return url.match(issueURLPattern) !== null;
+}
+
+const renderInternalError = () => {
+    return <p>Something went wrong. Please try again later.</p>;
+}
+
+const renderPreview = (getValues: UseFormGetValues<FieldValues>, formState: FormState<FieldValues>) => {
+    // A lot of this validation should have already occurred
+    if (!formState.isValid) {
+        return renderInternalError();
+    }
+
+    const values = getValues();
+    const issueURL = values["issueURL"];
+    if (!issueURL) {
+        return renderInternalError();
+    }
+
+    const match = issueURL.match(issueURLPattern);
+    if (match === null) {
+        return renderInternalError();
+    }
+
+    const bountyAmount = values["bountyAmount"];
+    if (!bountyAmount) {
+        return renderInternalError();
+    }
+
+    const [orgName, repoName] = [match[1], match[2]];
+    return (
+        <ul>
+            <li>organization: {orgName}</li>
+            <li>repo: {repoName}</li>
+            <li>issue url: {issueURL}</li>
+            <li>bounty amount: {bountyAmount}</li>
+        </ul>
+    );
+}
+
 const NewBounty = () => {
     const [formStep, setFormStep] = React.useState(FormStep.IssueURL);
-    const { watch, register, formState } = useForm({
+    const { getValues, register, formState } = useForm({
         mode: 'all'
     });
 
@@ -72,22 +114,31 @@ const NewBounty = () => {
                     id="issue_url"
                     className="text-input"
                     autoComplete="off"
-                    {...register("test", {
-                        required: true,
-                        pattern: /^https:\/\/github.com\/[^-][^/]{0,38}\/[-_.A-Za-z0-9]{1,100}\/issues\/\d{1,10}\/?$/
+                    {...register("issueURL", {
+                        validate: validateIssueURL,
                       })}
                 />
             </section>}
             {formStep === FormStep.BountyAmount && <section>
                 <p>bounty amount pls</p>
+                <input
+                    type="number"
+                    id="bounty_amount"
+                    autoComplete="off"
+                    {...register("bountyAmount", {
+                        required: true,
+                        min: .001,
+                    })}
+                />
             </section>}
             {formStep === FormStep.BountyPreview && <section>
                 <p>here's your bounty preview</p>
+                {renderPreview(getValues, formState)}
             </section>}
             {formStep === FormStep.BountyCreated && <section>
                 <p>your bounty was created</p>
             </section>}
-            {renderBackButton(formStep, setFormStep, formState.isValid)}
+            {renderBackButton(formStep, setFormStep)}
             {renderNextButton(formStep, setFormStep, formState.isValid)}
         </form>
     );
