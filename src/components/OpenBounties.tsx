@@ -6,6 +6,7 @@ import {
     SortingState,
     useTableInstance,
   } from '@tanstack/react-table'
+import { Link } from "react-router-dom";
 
 type Bounty = {
     project: string,
@@ -81,7 +82,8 @@ function OpenBounties() {
     });
 
       return (
-        <div>
+        <>
+            <Link to="/new-bounty">+ New Bounty</Link>
             <table>
                 <thead>
                 {instance.getHeaderGroups().map(headerGroup => (
@@ -119,7 +121,7 @@ function OpenBounties() {
                 ))}
                 </tbody>
             </table>
-        </div>
+        </>
       )
 }
 
