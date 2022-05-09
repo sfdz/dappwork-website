@@ -89,6 +89,7 @@ const renderPreview = (getValues: UseFormGetValues<FieldValues>, formState: Form
     if (match === null) {
         return renderInternalError();
     }
+    const [orgName, repoName] = [match[1], match[2]];
 
     const bountyAmount = values["bountyAmount"];
     if (!bountyAmount) {
@@ -96,11 +97,10 @@ const renderPreview = (getValues: UseFormGetValues<FieldValues>, formState: Form
     }
 
     const bountyDuration = values["bountyDuration"];
-    if (!bountyAmount) {
+    if (!bountyDuration) {
         return renderInternalError();
     }
 
-    const [orgName, repoName] = [match[1], match[2]];
     return (
         <ul>
             <li>organization: {orgName}</li>
@@ -147,7 +147,7 @@ const NewBounty = () => {
                     />
                     1 week
                 </label>
-                
+
                 <label>
                     <input
                         type="radio"
@@ -157,7 +157,7 @@ const NewBounty = () => {
                     />
                     2 weeks
                 </label>
-                
+
                 <label>
                     <input
                         type="radio"

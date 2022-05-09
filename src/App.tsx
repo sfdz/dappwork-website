@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import ClaimBounty from './components/ClaimBounty';
+import BountyDetail from './components/BountyDetail';
 import NewBounty from './components/NewBounty';
 import OpenBounties from './components/OpenBounties';
 
@@ -13,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<OpenBounties />} />
           <Route path="/new-bounty" element={<NewBounty />} />
-          <Route path="/bounty/:id" element={<ClaimBounty githubUsername='sfdz' />} />
+          <Route path="/bounty/:id" element={<BountyDetail />} />
         </Routes>
       </header>
     </div>
