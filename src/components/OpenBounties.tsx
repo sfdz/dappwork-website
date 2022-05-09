@@ -63,7 +63,6 @@ const defaultColumns = [
 ]
 
 function OpenBounties() {
-    // eslint-disable-next-line
     const [data] = React.useState(() => [...defaultData]);
     const [columns] = React.useState<typeof defaultColumns>(() => [
         ...defaultColumns,
