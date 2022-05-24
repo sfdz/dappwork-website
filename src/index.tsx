@@ -4,6 +4,13 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
+import { Web3ReactHooks, Web3ReactProvider } from '@web3-react/core';
+import { Network } from '@web3-react/network';
+import { hooks as networkHooks, network } from './connectors/network';
+
+const connectors: [Network, Web3ReactHooks][] = [
+  [network, networkHooks],
+];
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -11,7 +18,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <Web3ReactProvider connectors={connectors}>
+        <App />
+      </Web3ReactProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     createTable,
     getCoreRowModelSync,
     getSortedRowModelSync,
     SortingState,
     useTableInstance,
-  } from '@tanstack/react-table'
+  } from '@tanstack/react-table';
+import { useWeb3React } from '@web3-react/core'
 import { Link } from "react-router-dom";
+import { BOUNTY_FACTORY_ABI, BOUNTY_FACTORY_ADDRESS } from '../abi';
+import { Contract } from '@ethersproject/contracts';
 
 type Bounty = {
     project: string,
@@ -64,6 +67,16 @@ const defaultColumns = [
 ]
 
 function OpenBounties() {
+    const context = useWeb3React();
+    const { connector, provider } = context;
+
+    useEffect(() => {
+        connector.activate();
+        const contract = new Contract(BOUNTY_FACTORY_ADDRESS, BOUNTY_FACTORY_ABI, provider);
+        contract.functions.bfViewBounty(0)
+            .then(bounty => console.log(bounty));
+    }, [connector, provider]);
+
     const [data] = React.useState(() => [...defaultData]);
     const [columns] = React.useState<typeof defaultColumns>(() => [
         ...defaultColumns,
@@ -83,6 +96,7 @@ function OpenBounties() {
 
       return (
         <>
+            {provider === undefined && <p>Web 3 Provider not found 😔</p>}
             <Link to="/new-bounty">+ New Bounty</Link>
             <table>
                 <thead>
