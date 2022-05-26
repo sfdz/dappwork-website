@@ -10,6 +10,7 @@ import { useWeb3React } from '@web3-react/core'
 import { Link } from "react-router-dom";
 import { BOUNTY_FACTORY_ABI, BOUNTY_FACTORY_ADDRESS } from '../abi';
 import { Contract } from '@ethersproject/contracts';
+import { formatEther } from '@ethersproject/units';
 
 type Bounty = {
     project: string,
@@ -21,22 +22,7 @@ type Bounty = {
 
 const table = createTable().setRowType<Bounty>();
 
-const defaultData: Bounty[] = [
-    {
-        project: 'DAppWork',
-        issue: 'Add github link to bounty titles',
-        issueLink: 'https://github.com/',
-        bountyAmount: '.005 WETH',
-        postedDate: '2022-05-05'
-    },
-    {
-        project: 'Polygon',
-        issue: 'Reach a billion users',
-        issueLink: 'https://github.com/',
-        bountyAmount: '.006 WETH',
-        postedDate: '2022-05-06'
-    },
-]
+const OPEN_STATUS = 0;
 
 const defaultColumns = [
     table.createGroup({
@@ -70,14 +56,38 @@ function OpenBounties() {
     const context = useWeb3React();
     const { connector, provider } = context;
 
+    const [bounties, setBounties] = React.useState<Bounty[]>([]);
+
     useEffect(() => {
         connector.activate();
         const contract = new Contract(BOUNTY_FACTORY_ADDRESS, BOUNTY_FACTORY_ABI, provider);
-        contract.functions.bfViewBounty(0)
-            .then(bounty => console.log(bounty));
+        contract.functions.bfViewBountyArrayLength()
+            .then(numBounties => {
+                const result: Array<Bounty> = [];
+                for (let i = 0; i < numBounties; i++) {
+                    contract.functions.bfViewBounty(i)
+                        .then(bountyTuple => {
+                            console.log(bountyTuple);
+                            if (bountyTuple[4] !== OPEN_STATUS) {
+                                return;
+                            }
+
+                            const bounty: Bounty = {
+                                project: "Dappwork",
+                                issue: bountyTuple[1],
+                                issueLink: bountyTuple[2],
+                                bountyAmount: formatEther(bountyTuple[3]) + " Ξ",
+                                postedDate: bountyTuple[5]
+                            };
+                            result.push(bounty);
+                        });
+                }
+
+                setBounties(result);
+            })
     }, [connector, provider]);
 
-    const [data] = React.useState(() => [...defaultData]);
+    const [data] = React.useState(() => [...bounties]);
     const [columns] = React.useState<typeof defaultColumns>(() => [
         ...defaultColumns,
     ]);
