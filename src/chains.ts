@@ -1,8 +1,8 @@
 import type { AddEthereumChainParameter } from '@web3-react/types';
 
-const MATIC: AddEthereumChainParameter['nativeCurrency'] = {
-    name: 'Matic',
-    symbol: 'MATIC',
+const ETH: AddEthereumChainParameter['nativeCurrency'] = {
+    name: 'Ether',
+    symbol: 'ETH',
     decimals: 18,
 };
 
@@ -17,12 +17,12 @@ interface ExtendedChainInformation extends BasicChainInformation {
 }
 
 export const CHAINS: { [chainId: number]: BasicChainInformation | ExtendedChainInformation } = {
-    80001: {
-        urls: ["https://polygon-mumbai.infura.io/v3/0dfa29e50e11402a9014a2a0c9346003"],
-        name: 'Polygon Mumbai',
-        nativeCurrency: MATIC,
-        blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    }
+    42: {
+        urls: ["https://kovan.infura.io/v3/0dfa29e50e11402a9014a2a0c9346003"].filter(
+          (url) => url !== undefined
+        ),
+        name: 'Kovan',
+    },
 };
 
 export const URLS: { [chainId: number]: string[] } = Object.keys(CHAINS).reduce<{ [chainId: number]: string[] }>(
