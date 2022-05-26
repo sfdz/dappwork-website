@@ -11,7 +11,7 @@ function App() {
       <header className="App-header">
         <h1>DAppWork</h1>
         <Routes>
-          <Route path="/" element={<OpenBounties />} />
+          <Route path="/:factoryAddress" element={<OpenBounties />} />
           <Route path="/new-bounty" element={<NewBounty />} />
           <Route path="/bounty/:id" element={<BountyDetail />} />
         </Routes>

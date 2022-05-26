@@ -7,7 +7,7 @@ import {
     useTableInstance,
   } from '@tanstack/react-table';
 import { useWeb3React } from '@web3-react/core'
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { BOUNTY_FACTORY_ABI, BOUNTY_FACTORY_ADDRESS } from '../abi';
 import { Contract } from '@ethersproject/contracts';
 import { formatEther } from '@ethersproject/units';
@@ -58,9 +58,15 @@ function OpenBounties() {
 
     const [bounties, setBounties] = React.useState<Bounty[]>([]);
 
+    const { factoryAddress } = useParams();
+
     useEffect(() => {
+        if (factoryAddress === undefined) {
+            return;
+        }
+
         connector.activate();
-        const contract = new Contract(BOUNTY_FACTORY_ADDRESS, BOUNTY_FACTORY_ABI, provider);
+        const contract = new Contract(factoryAddress, BOUNTY_FACTORY_ABI, provider);
         contract.functions.bfViewBountyArrayLength()
             .then(numBounties => {
                 const result: Array<Bounty> = [];
@@ -73,7 +79,7 @@ function OpenBounties() {
                             }
 
                             const bounty: Bounty = {
-                                project: "Dappwork",
+                                project: "Dappwork", // TODO: parse out repo name
                                 issue: bountyTuple[1],
                                 issueLink: bountyTuple[2],
                                 bountyAmount: formatEther(bountyTuple[3]) + " Ξ",
