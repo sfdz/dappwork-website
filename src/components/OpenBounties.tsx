@@ -8,7 +8,7 @@ import {
   } from '@tanstack/react-table';
 import { useWeb3React } from '@web3-react/core'
 import { Link, useParams } from "react-router-dom";
-import { BOUNTY_FACTORY_ABI, BOUNTY_FACTORY_ADDRESS } from '../abi';
+import { BOUNTY_FACTORY_ABI } from '../abi';
 import { Contract } from '@ethersproject/contracts';
 import { formatEther } from '@ethersproject/units';
 
@@ -89,7 +89,7 @@ function OpenBounties() {
             });
         }
         promiseChain.then(() => setBounties(result));
-    }, [connector, provider]);
+    }, [connector, provider, factoryAddress]);
 
     const [columns] = React.useState<typeof defaultColumns>(() => [
         ...defaultColumns,
