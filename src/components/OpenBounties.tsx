@@ -69,7 +69,7 @@ function OpenBounties() {
         const contract = new Contract(factoryAddress, BOUNTY_FACTORY_ABI, provider);
         const result: Array<Bounty> = [];
         let promiseChain = Promise.resolve();
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 1; i++) {
             promiseChain = promiseChain.then(() => {
                 return contract.functions.bfViewBounty(i);
             }).then(bountyTuple => {
@@ -106,6 +106,15 @@ function OpenBounties() {
         getCoreRowModel: getCoreRowModelSync(),
         getSortedRowModel: getSortedRowModelSync(),
     });
+
+    if (bounties.length === 0) {
+        return (
+            <>
+                <Link to="/new-bounty">+ New Bounty</Link>
+                <p>No open bounties found at this address 😔</p>
+            </>
+        );
+    }
 
       return (
         <>
