@@ -67,40 +67,37 @@ function OpenBounties() {
 
         connector.activate();
         const contract = new Contract(factoryAddress, BOUNTY_FACTORY_ABI, provider);
-        contract.functions.bfViewBountyArrayLength()
-            .then(numBounties => {
-                const result: Array<Bounty> = [];
-                for (let i = 0; i < numBounties; i++) {
-                    contract.functions.bfViewBounty(i)
-                        .then(bountyTuple => {
-                            console.log(bountyTuple);
-                            if (bountyTuple[4] !== OPEN_STATUS) {
-                                return;
-                            }
-
-                            const bounty: Bounty = {
-                                project: "Dappwork", // TODO: parse out repo name
-                                issue: bountyTuple[1],
-                                issueLink: bountyTuple[2],
-                                bountyAmount: formatEther(bountyTuple[3]) + " Ξ",
-                                postedDate: bountyTuple[5]
-                            };
-                            result.push(bounty);
-                        });
+        const result: Array<Bounty> = [];
+        let promiseChain = Promise.resolve();
+        for (let i = 0; i < 3; i++) {
+            promiseChain = promiseChain.then(() => {
+                return contract.functions.bfViewBounty(i);
+            }).then(bountyTuple => {
+                if (bountyTuple[4] !== OPEN_STATUS) {
+                    return;
                 }
 
-                setBounties(result);
-            })
+                const bounty: Bounty = {
+                    project: parseRepoName(bountyTuple[2]),
+                    issue: bountyTuple[1],
+                    issueLink: bountyTuple[2],
+                    bountyAmount: formatEther(bountyTuple[3]) + " Ξ",
+                    postedDate: new Date(bountyTuple[5].mul(1000).toNumber()).toISOString(),
+                };
+                console.log(bounty);
+                result.push(bounty);
+            });
+        }
+        promiseChain.then(() => setBounties(result));
     }, [connector, provider]);
 
-    const [data] = React.useState(() => [...bounties]);
     const [columns] = React.useState<typeof defaultColumns>(() => [
         ...defaultColumns,
     ]);
     const [sorting, setSorting] = React.useState<SortingState>([]);
 
     const instance = useTableInstance(table, {
-        data,
+        data: bounties,
         columns,
         state: {
             sorting,
@@ -153,6 +150,16 @@ function OpenBounties() {
             </table>
         </>
       )
+}
+
+const parseRepoName = (issueURL: String) => {
+    const issueURLPattern = /^https:\/\/github.com\/[^-][^/]{0,38}\/([-_.A-Za-z0-9]{1,100})\/issues\/\d{1,10}\/?$/;
+    const match = issueURL.match(issueURLPattern);
+    if (match === null) {
+        return "";
+    }
+
+    return match[1];
 }
 
 export default OpenBounties;
